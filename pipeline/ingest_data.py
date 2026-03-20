@@ -7,16 +7,20 @@
 import pandas as pd
 from sqlalchemy import create_engine
 from tqdm.auto import tqdm
+import click
 # pd.__file__
 
-def run():
-    year = 2021
-    month = 1
-    pg_user = 'root'
-    pg_pass = 'root'
-    pg_host = 'localhost'
-    pg_port = '5432'
-    pg_db = 'ny_taxi'
+@click.command()
+@click.option('--year', default=2021, type=int)
+@click.option('--month', default=1, type=int)
+@click.option('--pg-user', default='root')
+@click.option('--pg-pass', default='root')
+@click.option('--pg-host', default='localhost')
+@click.option('--pg-port', default='5432')
+@click.option('--pg-db', default='ny_taxi')
+@click.option('--chunk-size', default=100000, type=int)
+@click.option('--target-table', default='yellow_taxi_data')
+def run(year, month, pg_user, pg_pass, pg_host, pg_port, pg_db, chunk_size, target_table):
 
 
     # Read a sample of the data
@@ -58,8 +62,6 @@ def run():
 
     engine = create_engine(f'postgresql+psycopg://{pg_user}:{pg_pass}@{pg_host}:{pg_port}/{pg_db}')
 
-    chunk_size = 100000
-    target_table = 'yellow_taxi_data'
 
     df_iter = pd.read_csv(
         prefix + f'yellow_tripdata_{year}-{month:02d}.csv.gz',
